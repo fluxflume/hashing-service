@@ -109,7 +109,7 @@ The provided implementations make use of goroutines and channels, `LocalPublishe
 **Stats**
 
 This interface is simple, and provides a clean way to update the total count and average. The provided
-implementation, `LocalStats` uses a `RWMutex` to ensure the value is readable/writable from multiple goroutines.
+implementation, `LocalStats` uses a `RWMutex` to ensure the value is safely readable/writable from multiple goroutines.
 
 To support scaling beyond 1 instance of this service, the stats data would be distributed (database, distributed cache
 etc.), and an aggregated view of all service instances would be needed.
