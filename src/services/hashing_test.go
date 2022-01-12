@@ -56,7 +56,8 @@ func TestStoreGetInteraction(t *testing.T) {
 	store := NewTestHashedItemStore(func(id uint64) (models.HashedItem, error) {
 		return item, nil
 	}, nil)
-	hashingService := CreateDefaultHashingService(&publisher, &store, nil)
+	idGenerator := NewLocalIdGenerator()
+	hashingService := CreateDefaultHashingService(publisher, store, idGenerator)
 	result, err := hashingService.Get(1)
 	if err != nil {
 		t.Error(err)
@@ -77,7 +78,8 @@ func TestStoreGetErrorInteraction(t *testing.T) {
 	store := NewTestHashedItemStore(func(id uint64) (models.HashedItem, error) {
 		return models.HashedItem{}, e
 	}, nil)
-	hashingService := CreateDefaultHashingService(&publisher, &store, nil)
+	idGenerator := NewLocalIdGenerator()
+	hashingService := CreateDefaultHashingService(publisher, store, idGenerator)
 	_, err := hashingService.Get(1)
 	if err == nil {
 		t.Error("Expected error but received nil")
@@ -95,7 +97,8 @@ func TestPublisherPublishInteraction(t *testing.T) {
 		return nil
 	})
 	store := NewTestHashedItemStore(nil, nil)
-	hashingService := CreateDefaultHashingService(&publisher, &store, nil)
+	idGenerator := NewLocalIdGenerator()
+	hashingService := CreateDefaultHashingService(publisher, store, idGenerator)
 	result, err := hashingService.Create("test")
 	if err != nil {
 		t.Error(err)
