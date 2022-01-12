@@ -8,52 +8,52 @@ import (
 )
 
 // A stub for the CreatedEventPublisher
-type TestCreatedEventPublisher struct {
+type CreatedEventPublisherMock struct {
 	_publish func(hashedItem models.HashedItem) error
 }
 
-func (m *TestCreatedEventPublisher) Publish(hashedItem models.HashedItem) error {
+func (m *CreatedEventPublisherMock) Publish(hashedItem models.HashedItem) error {
 	if m._publish != nil {
 		return m._publish(hashedItem)
 	}
 	return nil
 }
 
-type TestHashedItemStore struct {
+type HashedItemStoreMock struct {
 	_put func(hashedEntity models.HashedItem) (models.HashedItem, error)
 	_get func(id uint64) (models.HashedItem, error)
 }
 
-func (m *TestHashedItemStore) Put(hashedEntity models.HashedItem) (models.HashedItem, error) {
+func (m *HashedItemStoreMock) Put(hashedEntity models.HashedItem) (models.HashedItem, error) {
 	if m._put != nil {
 		return m._put(hashedEntity)
 	}
 	return models.HashedItem{}, nil
 }
 
-func (m *TestHashedItemStore) Get(id uint64) (models.HashedItem, error) {
+func (m *HashedItemStoreMock) Get(id uint64) (models.HashedItem, error) {
 	if m._get != nil {
 		return m._get(id)
 	}
 	return models.HashedItem{}, nil
 }
 
-func NewTestCreatedEventPublisher(handler func(hashedItem models.HashedItem) error) CreatedEventPublisher {
-	return &TestCreatedEventPublisher{
+func NewCreatedEventPublisherMock(handler func(hashedItem models.HashedItem) error) CreatedEventPublisher {
+	return &CreatedEventPublisherMock{
 		_publish: handler,
 	}
 }
 
-func NewTestHashedItemStore(get func(id uint64) (models.HashedItem, error), put func(hashedEntity models.HashedItem) (models.HashedItem, error)) HashedItemStore {
-	return &TestHashedItemStore{_get: get, _put: put}
+func NewHashedItemStoreMock(get func(id uint64) (models.HashedItem, error), put func(hashedEntity models.HashedItem) (models.HashedItem, error)) HashedItemStore {
+	return &HashedItemStoreMock{_get: get, _put: put}
 }
 
 func TestStoreGetInteraction(t *testing.T) {
-	publisher := NewTestCreatedEventPublisher(func(hashedItem models.HashedItem) error {
+	publisher := NewCreatedEventPublisherMock(func(hashedItem models.HashedItem) error {
 		return nil
 	})
 	item := models.NewHashedItem(1, "test")
-	store := NewTestHashedItemStore(func(id uint64) (models.HashedItem, error) {
+	store := NewHashedItemStoreMock(func(id uint64) (models.HashedItem, error) {
 		return item, nil
 	}, nil)
 	idGenerator := NewLocalIdGenerator()
@@ -71,11 +71,11 @@ func TestStoreGetInteraction(t *testing.T) {
 }
 
 func TestStoreGetErrorInteraction(t *testing.T) {
-	publisher := NewTestCreatedEventPublisher(func(hashedItem models.HashedItem) error {
+	publisher := NewCreatedEventPublisherMock(func(hashedItem models.HashedItem) error {
 		return nil
 	})
 	e := fmt.Errorf("Boom")
-	store := NewTestHashedItemStore(func(id uint64) (models.HashedItem, error) {
+	store := NewHashedItemStoreMock(func(id uint64) (models.HashedItem, error) {
 		return models.HashedItem{}, e
 	}, nil)
 	idGenerator := NewLocalIdGenerator()
@@ -92,11 +92,11 @@ func TestStoreGetErrorInteraction(t *testing.T) {
 func TestPublisherPublishInteraction(t *testing.T) {
 	received := atomic.Value{}
 	item := models.NewHashedItem(0, "test")
-	publisher := NewTestCreatedEventPublisher(func(hashedItem models.HashedItem) error {
+	publisher := NewCreatedEventPublisherMock(func(hashedItem models.HashedItem) error {
 		received.Store(hashedItem)
 		return nil
 	})
-	store := NewTestHashedItemStore(nil, nil)
+	store := NewHashedItemStoreMock(nil, nil)
 	idGenerator := NewLocalIdGenerator()
 	hashingService := CreateDefaultHashingService(publisher, store, idGenerator)
 	result, err := hashingService.Create("test")
