@@ -98,7 +98,7 @@ that time, the database connection became flaky, and the call to store the item 
 lots of requests are coming in, those requests will build up and things could get messy.
 
 If instead, a hashed password is immediately published to a distributed messaging system, the message can be consumed by
-any service instance, and if there's a failure, the messaging system can re-deliever. It would redeliver until the
+any service instance, and if there's a failure, the messaging system can re-deliver. It would redeliver until the
 message was processed successfully, or worst case, place the message in a dead letter topic for manual intervention.
 
 The delay in this implementation represents a PubSub operations (produce/consume) and the time it takes to store the
@@ -172,7 +172,8 @@ I liked the ideas presented in this article, mainly, keeping things simple to be
 
 - https://tutorialedge.net/golang/go-project-structure-best-practices/
 
-I wanted to ensure the "interfaces" were isolated from implementation.
+I initially wanted the "interfaces" defined separately from implementations,
+but having them in the same file turned out to be pretty convenient for this project.
 
 ### Challenges
 
